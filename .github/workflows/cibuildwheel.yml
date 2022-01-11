@@ -1,11 +1,6 @@
 name: build
 
-on:
-  push:
-  pull_request:
-  release:
-    types:
-      - published
+on: push
 
 jobs:
 
@@ -31,7 +26,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
+        arch: [aarch64]
 
     steps:
       - uses: actions/checkout@v2
@@ -41,9 +37,11 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v1.12.0
         env:
+          CIBW_ARCHS_LINUX: ${{matrix.arch}}
           CIBW_BEFORE_ALL_LINUX: yum install -y openssl-devel
           CIBW_BEFORE_ALL_MACOS: brew install automake
           CIBW_ENVIRONMENT_MACOS: CC=gcc-9 CXX=g++-9
+          CIBW_MANYLINUX_AARCH64_IMAGE: quay.io/pypa/manylinux2014_aarch64
           CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux1_x86_64
           CIBW_MANYLINUX_I686_IMAGE: quay.io/pypa/manylinux1_i686
           CIBW_SKIP: pp*
